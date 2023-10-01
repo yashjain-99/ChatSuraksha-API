@@ -3,7 +3,7 @@ import { Server as socketServer } from "socket.io";
 export default function (server) {
   const io = new socketServer(server, {
     cors: {
-      origin: "https://chatsuraksha.vercel.app/",
+      origin: "https://chatsuraksha.vercel.app",
     },
   });
   const connectedUsers = [];
