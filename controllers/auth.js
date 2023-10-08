@@ -34,7 +34,7 @@ export const login = async (req, res, next) => {
 
     jwt.sign(
       payload,
-      process.env.JWT_SECRET || "secret",
+      process.env.JWT_SECRET,
       { expiresIn: "1d" },
       async (err, token) => {
         if (err) {
@@ -49,17 +49,20 @@ export const login = async (req, res, next) => {
       }
     );
   } catch (error) {
-    // Handle errors here and pass them to the error handling middleware
     next(error);
   }
 };
 
 export const signup = async (req, res, next) => {
   const { email, password, fullName, profilePicture } = req.body;
+
   if (!email || !password || !fullName)
     next(new AppError(400, "All fields are required"));
+
   const alreadyExists = await Users.findOne({ email });
+
   if (alreadyExists) next(new AppError(400, "User already exists"));
+
   try {
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);

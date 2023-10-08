@@ -2,8 +2,7 @@ import mongoose from "mongoose";
 const connectDB = async () => {
   try {
     await mongoose.connect(
-      process.env.MONGODB_URI ||
-        "mongodb+srv://ChatSurakshaAdmin:SecurePassword123@cluster0.qmrjj2v.mongodb.net/?retryWrites=true&w=majority",
+      `mongodb+srv://${process.env.db_username}:${process.env.db_password}@cluster0.qmrjj2v.mongodb.net/?retryWrites=true&w=majority`,
       {
         useNewUrlParser: true,
         useUnifiedTopology: true,

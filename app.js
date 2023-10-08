@@ -1,12 +1,13 @@
+import "dotenv/config";
 import express from "express";
 import cors from "cors";
+import http from "http";
 import socketIO from "./socket.js";
 import userRoutes from "./routes/user.js";
 import conversationRoutes from "./routes/conversation.js";
 import authRoutes from "./routes/auth.js";
-import { errorHandler } from "./middlewares/errorHandler.js"; // Import your errorHandler middleware here
+import { errorHandler } from "./middlewares/errorHandler.js";
 import "./connection.js";
-import * as http from "http";
 
 const app = express();
 const server = http.createServer(app);
@@ -15,9 +16,14 @@ const PORT = process.env.PORT || 3000;
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
-app.use(cors());
-
-// Initialize Socket.IO
+app.use(
+  cors({
+    origin:
+      process.env.NODE_ENV == "development"
+        ? process.env.DEV_URL
+        : process.env.PROD_URL,
+  })
+);
 
 // Mount route modules
 app.use("/api/users", userRoutes);

@@ -3,7 +3,10 @@ import { Server as socketServer } from "socket.io";
 export default function (server) {
   const io = new socketServer(server, {
     cors: {
-      origin: "https://chatsuraksha.vercel.app",
+      origin:
+        process.env.NODE_ENV == "development"
+          ? process.env.DEV_URL
+          : process.env.PROD_URL,
     },
   });
   const connectedUsers = [];
@@ -29,6 +32,7 @@ export default function (server) {
         console.log("disconnected");
         console.log("connected users", connectedUsers);
       });
+      console.log(connectedUsers);
     });
     socket.on("sendMessage", ({ senderId, reciepientId, text }) => {
       const index = connectedUsers.findIndex(
