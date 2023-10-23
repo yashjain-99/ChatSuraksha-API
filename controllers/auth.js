@@ -26,28 +26,34 @@ export const login = async (req, res, next) => {
       throw new AppError(400, "Invalid credentials");
     }
 
-    // Generate JWT
     const payload = {
       userId: user._id,
       email: user.email,
     };
 
-    jwt.sign(
-      payload,
-      process.env.JWT_SECRET,
-      { expiresIn: "1d" },
-      async (err, token) => {
-        if (err) {
-          throw new AppError(500, "Something went wrong!");
-        }
+    const accessToken = jwt.sign(payload, process.env.ACCESS_TOKEN_SECRET, {
+      expiresIn: "1h",
+    });
 
-        // Update user token
-        await Users.updateOne({ _id: user._id }, { $set: { token } });
+    const refreshToken = jwt.sign(payload, process.env.REFRESH_TOKEN_SECRET, {
+      expiresIn: "1d",
+    });
 
-        // Send response
-        res.status(200).json({ ...payload, fullName: user.fullName, token });
-      }
-    );
+    // Saving refreshToken with current user
+    await Users.updateOne({ _id: user._id }, { $set: { token: refreshToken } });
+
+    // Creates Secure Cookie with refresh token
+    res.cookie("jwt", refreshToken, {
+      httpOnly: true,
+      secure: true,
+      sameSite: "none",
+      maxAge: 24 * 60 * 60 * 1000,
+    });
+
+    // Send authorization roles and access token to user
+    res
+      .status(200)
+      .json({ ...payload, fullName: user.fullName, token: accessToken });
   } catch (error) {
     next(error);
   }
@@ -56,12 +62,17 @@ export const login = async (req, res, next) => {
 export const signup = async (req, res, next) => {
   const { email, password, fullName, profilePicture } = req.body;
 
-  if (!email || !password || !fullName)
+  if (!email || !password || !fullName) {
     next(new AppError(400, "All fields are required"));
+    return; // Return to prevent further execution
+  }
 
   const alreadyExists = await Users.findOne({ email });
 
-  if (alreadyExists) next(new AppError(400, "User already exists"));
+  if (alreadyExists) {
+    next(new AppError(400, "User already exists"));
+    return; // Return to prevent further execution
+  }
 
   try {
     const salt = await bcrypt.genSalt(10);
