@@ -12,14 +12,18 @@ const validateSession = async (req, res, next) => {
 
     const foundUser = await Users.findById(userId);
     if (!foundUser) return res.sendStatus(401);
+    if (!foundUser.token) return res.sendStatus(401);
 
-    const refreshToken = foundUser.token;
+    const refreshToken = cookies.jwt;
+    if (foundUser.token !== refreshToken) {
+      return res.sendStatus(401);
+    }
     jwt.verify(
       refreshToken,
       process.env.REFRESH_TOKEN_SECRET,
       (err, decoded) => {
         if (err || foundUser.username !== decoded.username) {
-          return res.sendStatus(403);
+          return res.sendStatus(401);
         }
 
         const payload = {
@@ -35,6 +39,7 @@ const validateSession = async (req, res, next) => {
           fullName: foundUser.fullName,
           token: accessToken,
         });
+        res.end();
       }
     );
   } catch (error) {

@@ -89,3 +89,29 @@ export const signup = async (req, res, next) => {
     next(new AppError(500, "Something went wrong!"));
   }
 };
+
+export const logout = async (req, res, next) => {
+  try {
+    const { userId } = req.body;
+
+    // Validate input
+    if (!userId) {
+      return res.status(204);
+    }
+
+    // Find user
+    const user = await Users.findById(userId);
+
+    if (!user) {
+      return res.status(204);
+    }
+
+    // Saving refreshToken with current user
+    await Users.updateOne({ _id: user._id }, { $unset: { token: "" } });
+    res.clearCookie("jwt");
+    res.status(200);
+    res.end();
+  } catch (error) {
+    next(error);
+  }
+};
