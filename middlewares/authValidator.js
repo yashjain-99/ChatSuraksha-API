@@ -15,8 +15,7 @@ const validate = (method) => {
     }
     case "signup": {
       return [
-        body("name").notEmpty().withMessage("Name is required"),
-
+        body("fullName").notEmpty().withMessage("Name is required"),
         body("email")
           .notEmpty()
           .withMessage("Email is required")
