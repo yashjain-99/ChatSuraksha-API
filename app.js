@@ -5,6 +5,7 @@ import http from "http";
 import socketIO from "./socket.js";
 import userRoutes from "./routes/user.js";
 import conversationRoutes from "./routes/conversation.js";
+import inboxRoutes from "./routes/inbox.js";
 import authRoutes from "./routes/auth.js";
 import { errorHandler } from "./middlewares/errorHandler.js";
 import "./connection.js";
@@ -29,6 +30,7 @@ app.use(cookieParser());
 
 // Mount route modules
 app.use("/api/users", userRoutes);
+app.use("/api/inbox", inboxRoutes);
 app.use("/api/conversations", conversationRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/validate", validate);
