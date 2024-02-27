@@ -4,6 +4,6 @@ import {
 } from "../controllers/conversation.js";
 import express from "express";
 const router = express.Router();
-router.get("/:userId", getConversations);
+router.get("/", getConversations);
 router.post("/", createConversation);
 export default router;

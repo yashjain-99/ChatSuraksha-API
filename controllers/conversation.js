@@ -1,35 +1,23 @@
 import Conversations from "../models/conversations.js";
-import Users from "../models/users.js";
 
 export const getConversations = async (req, res) => {
-  const { userId } = req.params;
+  const { userId, otherUserId } = req.query;
   try {
     const conversations = await Conversations.find({
-      $or: [{ reciepientId: userId }, { senderId: userId }],
+      $or: [
+        { reciepientId: userId, senderId: otherUserId },
+        { reciepientId: otherUserId, senderId: userId },
+      ],
     });
     //get user details for each conversation and add to the conversation object
-    const conversationsWithUserDetails = await Promise.all(
-      conversations.map(async (conversation) => {
-        if (conversation.reciepientId === userId) {
-          const user = await Users.findOne({ _id: conversation.senderId });
-          return {
-            ...conversation._doc,
-            otherUserId: user._id,
-            otherUserName: user.fullName,
-            otherUserProfilePicture: user.profilePicture,
-          };
-        } else {
-          const user = await Users.findOne({ _id: conversation.reciepientId });
-          return {
-            ...conversation._doc,
-            otherUserId: user._id,
-            otherUserName: user.fullName,
-            otherUserProfilePicture: user.profilePicture,
-          };
-        }
-      })
-    );
-    res.status(200).json({ conversationsWithUserDetails });
+    const refactoredConversation = conversations.map((conversation) => {
+      return {
+        message: conversation.text,
+        self: conversation.senderId === userId,
+        date: conversation.date,
+      };
+    });
+    res.status(200).json({ conversations: refactoredConversation });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
