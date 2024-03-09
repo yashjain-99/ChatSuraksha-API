@@ -27,7 +27,7 @@ const validateSession = async (req, res, next) => {
         }
 
         const payload = {
-          userId: decoded._id,
+          userId: decoded.userId,
           email: decoded.email,
         };
         const accessToken = jwt.sign(payload, process.env.ACCESS_TOKEN_SECRET, {
@@ -37,6 +37,7 @@ const validateSession = async (req, res, next) => {
         res.status(200).json({
           ...payload,
           fullName: foundUser.fullName,
+          profilePicture: foundUser.profilePicture,
           token: accessToken,
         });
         res.end();

@@ -53,7 +53,12 @@ export const login = async (req, res, next) => {
     // Send authorization roles and access token to user
     res
       .status(200)
-      .json({ ...payload, fullName: user.fullName, token: accessToken });
+      .json({
+        ...payload,
+        fullName: user.fullName,
+        profilePicture: user.profilePicture,
+        token: accessToken,
+      });
   } catch (error) {
     next(error);
   }
