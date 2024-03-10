@@ -8,10 +8,12 @@ import conversationRoutes from "./routes/conversation.js";
 import imageRoutes from "./routes/image.js";
 import inboxRoutes from "./routes/inbox.js";
 import authRoutes from "./routes/auth.js";
+import refreshRoute from "./routes/refresh.js";
 import { errorHandler } from "./middlewares/errorHandler.js";
 import "./connection.js";
 import cookieParser from "cookie-parser";
 import validate from "./routes/validate.js";
+import authenticateJWT from "./middlewares/autheticateJWT.js";
 
 const app = express();
 const server = http.createServer(app);
@@ -30,12 +32,15 @@ app.use(cors({ origin: allowedOrigins, credentials: true }));
 app.use(cookieParser());
 
 // Mount route modules
+app.use("/api/auth", authRoutes);
+app.use("/api/validate", validate);
+app.use("/api/refresh", refreshRoute);
+
+app.use(authenticateJWT);
 app.use("/api/users", userRoutes);
 app.use("/api/inbox", inboxRoutes);
 app.use("/api/conversations", conversationRoutes);
 app.use("/api/image", imageRoutes);
-app.use("/api/auth", authRoutes);
-app.use("/api/validate", validate);
 
 // Use the errorHandler middleware at the end
 app.use(errorHandler);

@@ -2,12 +2,12 @@ import jwt from "jsonwebtoken";
 import { AppError } from "../middlewares/errorHandler.js";
 import Users from "../models/users.js";
 
-const validateSession = async (req, res, next) => {
+const refresh = async (req, res, next) => {
   try {
     const cookies = req.cookies;
     if (!cookies?.jwt) return res.sendStatus(401);
 
-    const { userId } = req.body;
+    const { userId } = req.query;
     if (!userId) return res.sendStatus(401);
 
     const foundUser = await Users.findById(userId);
@@ -35,17 +35,14 @@ const validateSession = async (req, res, next) => {
         });
 
         res.status(200).json({
-          ...payload,
-          fullName: foundUser.fullName,
-          profilePicture: foundUser.profilePicture,
-          token: accessToken,
+          accessToken,
         });
         res.end();
       }
     );
   } catch (error) {
-    next(new AppError(401, "Failed to validate session"));
+    next(new AppError(401, "Failed to generate new access token"));
   }
 };
 
-export default validateSession;
+export default refresh;

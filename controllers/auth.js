@@ -32,7 +32,7 @@ export const login = async (req, res, next) => {
     };
 
     const accessToken = jwt.sign(payload, process.env.ACCESS_TOKEN_SECRET, {
-      expiresIn: "1h",
+      expiresIn: 60 * 2,
     });
 
     const refreshToken = jwt.sign(payload, process.env.REFRESH_TOKEN_SECRET, {
@@ -51,14 +51,12 @@ export const login = async (req, res, next) => {
     });
 
     // Send authorization roles and access token to user
-    res
-      .status(200)
-      .json({
-        ...payload,
-        fullName: user.fullName,
-        profilePicture: user.profilePicture,
-        token: accessToken,
-      });
+    res.status(200).json({
+      ...payload,
+      fullName: user.fullName,
+      profilePicture: user.profilePicture,
+      token: accessToken,
+    });
   } catch (error) {
     next(error);
   }
