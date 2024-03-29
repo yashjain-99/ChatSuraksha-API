@@ -25,6 +25,9 @@ const userSchema = new mongoose.Schema({
   token: {
     type: String,
   },
+  totpSecret: {
+    type: Object,
+  },
 });
 
 const Users = mongoose.model("User", userSchema);

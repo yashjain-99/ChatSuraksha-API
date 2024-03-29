@@ -9,21 +9,21 @@ export const login = async (req, res, next) => {
 
     // Validate input
     if (!email || !password) {
-      throw new AppError(400, "All fields are required");
+      throw new AppError(401, "All fields are required");
     }
 
     // Find user
     const user = await Users.findOne({ email });
 
     if (!user) {
-      throw new AppError(400, "Invalid credentials");
+      throw new AppError(401, "Invalid credentials");
     }
 
     // Compare passwords
     const isMatch = await bcrypt.compare(password, user.password);
 
     if (!isMatch) {
-      throw new AppError(400, "Invalid credentials");
+      throw new AppError(401, "Invalid credentials");
     }
 
     const payload = {
@@ -66,14 +66,14 @@ export const signup = async (req, res, next) => {
   const { email, password, fullName, profilePicture } = req.body;
 
   if (!email || !password || !fullName) {
-    next(new AppError(400, "All fields are required"));
+    next(new AppError(401, "All fields are required"));
     return; // Return to prevent further execution
   }
 
   const alreadyExists = await Users.findOne({ email });
 
   if (alreadyExists) {
-    next(new AppError(400, "User already exists"));
+    next(new AppError(401, "User already exists"));
     return; // Return to prevent further execution
   }
 

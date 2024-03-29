@@ -14,6 +14,7 @@ import "./connection.js";
 import cookieParser from "cookie-parser";
 import validate from "./routes/validate.js";
 import authenticateJWT from "./middlewares/autheticateJWT.js";
+import { registerTotp, validateTotp, verifyTotp } from "./controllers/totp.js";
 
 const app = express();
 const server = http.createServer(app);
@@ -33,10 +34,13 @@ app.use(cookieParser());
 
 // Mount route modules
 app.use("/api/auth", authRoutes);
+app.post("/api/totp/validate", validateTotp);
 app.use("/api/validate", validate);
 app.use("/api/refresh", refreshRoute);
 
 app.use(authenticateJWT);
+app.post("/api/totp/register", registerTotp);
+app.post("/api/totp/verify", verifyTotp);
 app.use("/api/users", userRoutes);
 app.use("/api/inbox", inboxRoutes);
 app.use("/api/conversations", conversationRoutes);
